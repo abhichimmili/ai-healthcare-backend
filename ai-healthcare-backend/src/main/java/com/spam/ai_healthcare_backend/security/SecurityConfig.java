@@ -62,7 +62,8 @@ public class SecurityConfig {
 	            ).permitAll()
 
 	            // Login and Registration
-	            .requestMatchers("/api/auth/**").permitAll()
+	            .requestMatchers("/api/auth/**","/api/patients/**",
+	                    "/api/doctors/**").permitAll()
 
 	            // Patient APIs
 	            .requestMatchers("/api/patient/**").hasRole("PATIENT")
