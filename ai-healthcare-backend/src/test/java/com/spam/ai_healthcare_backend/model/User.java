@@ -17,6 +17,9 @@ public class User {
 
     @Column(length = 150, nullable = false, unique = true)
     private String email;
+    
+    @Column(name = "phone_number", length = 15, nullable = false)
+    private String phoneNumber;
 
     @Column(length = 255, nullable = false)
     private String password;
@@ -79,5 +82,13 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
