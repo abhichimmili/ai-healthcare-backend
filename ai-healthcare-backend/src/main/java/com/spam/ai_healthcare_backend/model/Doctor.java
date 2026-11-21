@@ -17,24 +17,19 @@ public class Doctor {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(length = 100, nullable = false)
     private String specialization;
 
-    @Column(length = 100, nullable = false)
     private String qualification;
 
-    @Column(name = "medical_license_number", length = 100, nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String medicalLicenseNumber;
 
-    @Column(name = "years_of_experience", nullable = false)
     private Integer yearsOfExperience;
 
-    @Column(name = "consultation_fee", precision = 10, scale = 2, nullable = false)
     private BigDecimal consultationFee;
 
-    // Default constructor
+    // Default Constructor
     public Doctor() {
-
     }
 
     // Getters and Setters
@@ -94,5 +89,4 @@ public class Doctor {
     public void setConsultationFee(BigDecimal consultationFee) {
         this.consultationFee = consultationFee;
     }
-
 }

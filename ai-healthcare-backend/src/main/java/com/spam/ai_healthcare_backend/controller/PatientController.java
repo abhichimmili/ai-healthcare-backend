@@ -10,7 +10,7 @@ import com.spam.ai_healthcare_backend.service.PatientService;
 
 @RestController
 @RequestMapping("/api/patients")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class PatientController {
 
     @Autowired
