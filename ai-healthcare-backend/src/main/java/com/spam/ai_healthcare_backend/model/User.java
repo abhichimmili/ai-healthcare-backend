@@ -1,3 +1,4 @@
+
 package com.spam.ai_healthcare_backend.model;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class User {
 
     @Column(length = 150, nullable = false, unique = true)
     private String email;
-    
+
     @Column(name = "phone_number", length = 15, nullable = false)
     private String phoneNumber;
 
@@ -32,6 +33,7 @@ public class User {
 
     // Default constructor
     public User() {
+
     }
 
     // Getters and Setters
@@ -60,6 +62,14 @@ public class User {
         this.email = email;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -83,12 +93,5 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-    
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
 }
