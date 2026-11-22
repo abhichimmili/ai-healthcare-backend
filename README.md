@@ -139,106 +139,54 @@ Allowed HTTP methods:
 - PUT
 - DELETE
 - OPTIONS
-
-If the frontend runs on a different port, update the allowed origin in `SecurityConfig.java`.
-
-## Common Issues
-
-### 1. 401 Unauthorized
-
-Possible reasons:
-
-- JWT token is missing.
-- JWT token is invalid or expired.
-- Authorization header is not sent correctly.
-
-Solution:
-- Check whether the token is stored in local storage.
-- Verify that the frontend sends the token in the Authorization header.
-
-### 2. 403 Forbidden
-
-Possible reasons:
-
-- User does not have the required role.
-- Database role does not match the expected Spring Security role.
-- Access is restricted by Spring Security configuration.
-
-Solution:
+If the frontend runs on a different origin or port, update the CORS
+allowed origins in SecurityConfig.
+Common Issues
+401 Unauthorized
+- The request may not include a bearer token.
+- The token may be expired or invalid.
+- Confirm that the frontend stores the login token under token.
+- Confirm that the Axios request interceptor sends
+  Authorization: Bearer <token>.
+403 Forbidden
+- The token may be valid but the logged-in user may not have the
+  required role.
 - Check the user's role in the database.
-- Verify the authorities loaded by `CustomUserDetailsService`.
-- Check the URL security rules in `SecurityConfig.java`.
-
-### 3. Database Connection Error
-
-Possible reasons:
-
-- MySQL server is not running.
-- Incorrect database name or credentials.
-- Missing database driver dependency.
-
-Solution:
-- Start the database server.
-- Verify the database configuration.
-- Check the MySQL connector dependency in `pom.xml`.
-
-### 4. CORS Error
-
-Solution:
-- Verify the frontend URL in `SecurityConfig.java`.
-- Ensure OPTIONS requests are allowed.
-- Restart the backend after configuration changes.
-
-## Project Structure
-
-The backend package root is:
-
-```text
+- Check the authorities created by CustomUserDetailsService.
+- Check route rules and any @PreAuthorize annotations.
+- Confirm that the frontend is calling the endpoint for the correct
+  role.
+Database connection failure
+- Confirm that the database server is running.
+- Check the JDBC URL, database name, username, and password.
+- Confirm that the required JDBC driver dependency is present.
+CORS error
+- Confirm that the frontend origin is included in the backend CORS
+  configuration.
+- Confirm that OPTIONS is allowed.
+- Restart the backend after changing the configuration.
+Suggested Project Structure
+The exact packages may differ. The backend currently uses the package
+root:
 com.spam.ai_healthcare_backend
-```
-
-Typical Spring Boot structure:
-
-```text
-src
- └── main
-     ├── java
-     │   └── com.spam.ai_healthcare_backend
-     │       ├── config
-     │       ├── controller
-     │       ├── model
-     │       ├── repository
-     │       ├── service
-     │       └── security
-     │
-     └── resources
-         └── application.properties
-```
-
-## Build the Project
-
-To generate the executable JAR file:
-
-```bash
+A typical Spring Boot structure is:
+src/
+└── main/
+    ├── java/
+    │   └── com/spam/ai_healthcare_backend/
+    │       ├── config/
+    │       ├── controller/
+    │       ├── model/
+    │       ├── repository/
+    │       ├── service/
+    │       └── security/
+    └── resources/
+        └── application.properties
+Build
+To create a packaged application:
 mvn clean package
-```
-
-The generated JAR file will be available inside the `target` directory.
-
-Run the JAR using:
-
-```bash
+The generated JAR is normally placed in the target/ directory. Run it
+with:
 java -jar target/<generated-jar-name>.jar
-```
-
-## Future Enhancements
-
-- Additional healthcare management APIs.
-- Improved appointment management.
-- Medical report management.
-- Enhanced authentication and authorization.
-- Additional patient and doctor services.
-
----
-
-**CareAI – Healthcare Management Application**
+Replace <generated-jar-name>.jar with the actual JAR filename created
+by Maven.
