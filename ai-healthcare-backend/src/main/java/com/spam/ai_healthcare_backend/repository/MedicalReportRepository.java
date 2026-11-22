@@ -14,10 +14,5 @@ public interface MedicalReportRepository
     List<MedicalReport> findTop5ByPatientIdOrderByUploadedAtDesc(
             Long patientId
     );
-    
-    List<MedicalReport> findPatientById(
-            Long patientId
-    );
-    
 
 }

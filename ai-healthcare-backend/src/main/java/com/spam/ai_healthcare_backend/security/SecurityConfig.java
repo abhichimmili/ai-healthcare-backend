@@ -3,6 +3,7 @@ package com.spam.ai_healthcare_backend.security;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -86,16 +87,19 @@ public class SecurityConfig {
 	    return http.build();
 	}
 
+	@Value("${app.cors.allowed-origin:http://localhost:5173}")
+	private String allowedOrigin;
+
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 
 		CorsConfiguration configuration = new CorsConfiguration();
 
-		configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+		configuration.setAllowedOrigins(List.of(allowedOrigin));
 
-		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
-		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
 
 		configuration.setAllowCredentials(true);
 
