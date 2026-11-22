@@ -2,60 +2,131 @@ package com.spam.ai_healthcare_backend.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.spam.ai_healthcare_backend.dto.MedicalHistoryRequest;
+import com.spam.ai_healthcare_backend.dto.MedicalHistoryResponse;
 import com.spam.ai_healthcare_backend.model.MedicalHistory;
+import com.spam.ai_healthcare_backend.model.Patient;
 import com.spam.ai_healthcare_backend.repository.MedicalHistoryRepository;
-import com.spam.ai_healthcare_backend.service.MedicalHistoryService;
+import com.spam.ai_healthcare_backend.repository.PatientRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class MedicalHistoryServiceImpl implements MedicalHistoryService {
 
-    @Autowired
-    private MedicalHistoryRepository medicalHistoryRepository;
+    private final MedicalHistoryRepository historyRepository;
+    private final PatientRepository patientRepository;
 
     @Override
-    public MedicalHistory addMedicalHistory(MedicalHistory history) {
-        return medicalHistoryRepository.save(history);
+    public MedicalHistoryResponse addMedicalHistory(
+            String email,
+            MedicalHistoryRequest request) {
+
+        Patient patient = getPatient(email);
+
+        MedicalHistory history = new MedicalHistory();
+
+        history.setPatient(patient);
+        history.setConditionName(request.getConditionName());
+        history.setDescription(request.getDescription());
+        history.setDiagnosisDate(request.getDiagnosisDate());
+        history.setTreatment(request.getTreatment());
+        history.setAllergies(request.getAllergies());
+
+        return convertToResponse(historyRepository.save(history));
     }
 
     @Override
-    public List<MedicalHistory> getAllMedicalHistory() {
-        return medicalHistoryRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<MedicalHistoryResponse> getMyMedicalHistory(String email) {
+
+        return historyRepository
+                .findByPatientUserEmailOrderByDiagnosisDateDesc(email)
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
     }
 
     @Override
-    public MedicalHistory getMedicalHistoryById(Long id) {
-        return medicalHistoryRepository.findById(id).orElse(null);
+    @Transactional(readOnly = true)
+    public MedicalHistoryResponse getMedicalHistoryById(
+            Long id,
+            String email) {
+
+        MedicalHistory history = getOwnedHistory(id, email);
+
+        return convertToResponse(history);
     }
 
     @Override
-    public List<MedicalHistory> getHistoryByPatientId(Long patientId) {
-        return medicalHistoryRepository.findByPatientId(patientId);
+    public MedicalHistoryResponse updateMedicalHistory(
+            Long id,
+            String email,
+            MedicalHistoryRequest request) {
+
+        MedicalHistory history = getOwnedHistory(id, email);
+
+        history.setConditionName(request.getConditionName());
+        history.setDescription(request.getDescription());
+        history.setDiagnosisDate(request.getDiagnosisDate());
+        history.setTreatment(request.getTreatment());
+        history.setAllergies(request.getAllergies());
+
+        return convertToResponse(historyRepository.save(history));
     }
 
     @Override
-    public MedicalHistory updateMedicalHistory(Long id, MedicalHistory history) {
+    public void deleteMedicalHistory(Long id, String email) {
 
-        MedicalHistory existingHistory =
-                medicalHistoryRepository.findById(id).orElse(null);
+        MedicalHistory history = getOwnedHistory(id, email);
 
-        if (existingHistory != null) {
-            existingHistory.setConditionName(history.getConditionName());
-            existingHistory.setDescription(history.getDescription());
-            existingHistory.setDiagnosisDate(history.getDiagnosisDate());
-            existingHistory.setTreatment(history.getTreatment());
-            existingHistory.setAllergies(history.getAllergies());
+        historyRepository.delete(history);
+    }
 
-            return medicalHistoryRepository.save(existingHistory);
+    private Patient getPatient(String email) {
+
+        return patientRepository.findByUserEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Patient profile not found"
+                ));
+    }
+
+    private MedicalHistory getOwnedHistory(Long id, String email) {
+
+        MedicalHistory history = historyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Medical history not found"
+                ));
+
+        if (!history.getPatient().getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Medical history not found"
+            );
         }
 
-        return null;
+        return history;
     }
 
-    @Override
-    public void deleteMedicalHistory(Long id) {
-        medicalHistoryRepository.deleteById(id);
+    private MedicalHistoryResponse convertToResponse(
+            MedicalHistory history) {
+
+        return new MedicalHistoryResponse(
+                history.getId(),
+                history.getConditionName(),
+                history.getDescription(),
+                history.getDiagnosisDate(),
+                history.getTreatment(),
+                history.getAllergies()
+        );
     }
 }

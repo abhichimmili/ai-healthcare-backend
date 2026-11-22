@@ -2,8 +2,8 @@ package com.spam.ai_healthcare_backend.security;
 
 import java.util.List;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -29,8 +29,6 @@ public class SecurityConfig {
 
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-	private final CustomUserDetailsService userDetailsService;
-
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -41,50 +39,34 @@ public class SecurityConfig {
 
 		return configuration.getAuthenticationManager();
 	}
+
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http)
-	        throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-	    http
-	        .csrf(csrf -> csrf.disable())
+		http.csrf(csrf -> csrf.disable())
 
-	        .cors(cors -> {})
+				.cors(cors -> {
+				})
 
-	        .sessionManagement(session ->
-	            session.sessionCreationPolicy(
-	                SessionCreationPolicy.STATELESS
-	            )
-	        )
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-	        .authorizeHttpRequests(auth -> auth
+				.authorizeHttpRequests(auth -> auth
 
-	        	    .requestMatchers(
-	        	        "/swagger-ui.html",
-	        	        "/swagger-ui/**",
-	        	        "/v3/api-docs/**",
-	        	        "/webjars/**"
-	        	    ).permitAll()
+						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**")
+						.permitAll()
 
-	        	    .requestMatchers(
-	        	        "/api/auth/**",
-	        	        "/api/patients/register",
-	        	        "/api/doctors/register"
-	        	    ).permitAll()
+						.requestMatchers("/api/auth/**", "/api/patients/register", "/api/doctors/register").permitAll()
 
-	        	    .requestMatchers("/api/patient/**")
-	        	        .hasRole("PATIENT")
+						.requestMatchers("/api/patient/**").hasRole("PATIENT")
 
-	        	    .requestMatchers("/api/doctor/**","/api/doctor/dashboard")
-	        	        .authenticated()
+						.requestMatchers("/api/doctor/**", "/api/doctor/dashboard").authenticated()
 
-	        	    .anyRequest().authenticated()
-	        	)
-	        .addFilterBefore(
-	            jwtAuthenticationFilter,
-	            UsernamePasswordAuthenticationFilter.class
-	        );
+						.requestMatchers("/api/medical-history/**", "/api/medical-reports/**").hasRole("PATIENT")
 
-	    return http.build();
+						.anyRequest().authenticated())
+				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+		return http.build();
 	}
 
 	@Value("${app.cors.allowed-origin:http://localhost:5173}")

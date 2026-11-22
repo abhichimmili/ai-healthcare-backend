@@ -18,85 +18,54 @@ import com.spam.ai_healthcare_backend.repository.PatientRepository;
 @Transactional(readOnly = true)
 public class PatientDashboardService {
 
-    private final PatientRepository patientRepository;
-    private final AppointmentRepository appointmentRepository;
-    private final MedicalReportRepository medicalReportRepository;
+	private final PatientRepository patientRepository;
+	private final AppointmentRepository appointmentRepository;
+	private final MedicalReportRepository medicalReportRepository;
 
-    public PatientDashboardService(
-            PatientRepository patientRepository,
-            AppointmentRepository appointmentRepository,
-            MedicalReportRepository medicalReportRepository) {
+	public PatientDashboardService(PatientRepository patientRepository, AppointmentRepository appointmentRepository,
+			MedicalReportRepository medicalReportRepository) {
 
-        this.patientRepository = patientRepository;
-        this.appointmentRepository = appointmentRepository;
-        this.medicalReportRepository = medicalReportRepository;
-    }
+		this.patientRepository = patientRepository;
+		this.appointmentRepository = appointmentRepository;
+		this.medicalReportRepository = medicalReportRepository;
+	}
 
-    public PatientDashboardDTO getDashboard(String email) {
+	public PatientDashboardDTO getDashboard(String email) {
 
-        Patient patient = patientRepository.findByUserEmail(email)
-                .orElseThrow(() ->
-                    new RuntimeException("Patient profile not found"));
+		Patient patient = patientRepository.findByUserEmail(email)
+				.orElseThrow(() -> new RuntimeException("Patient profile not found"));
 
-        Long patientId = patient.getId();
+		Long patientId = patient.getId();
 
-        long totalAppointments =
-                appointmentRepository.countByPatientId(patientId);
+		Long totalAppointments = appointmentRepository.countByPatientId(patientId);
 
-        long upcomingAppointments =
-                appointmentRepository
-                .countByPatientIdAndAppointmentDateAfterAndStatusNot(
-                    patientId,
-                    LocalDateTime.now(),
-                    "CANCELLED"
-                );
+		Long upcomingAppointments = appointmentRepository.countByPatientIdAndAppointmentDateAfterAndStatusNot(patientId,
+				LocalDateTime.now(), "CANCELLED");
 
-        long totalReports =
-                medicalReportRepository.countByPatientId(patientId);
+		Long totalReports = medicalReportRepository.countByPatientId(patientId);
 
-        return new PatientDashboardDTO(
-                patient.getUser().getName(),
-                totalAppointments,
-                upcomingAppointments,
-                totalReports,
-                "NOT_ASSESSED"
-        );
-    }
+		return new PatientDashboardDTO(patient.getUser().getName(), totalAppointments, upcomingAppointments,
+				totalReports, "NOT_ASSESSED");
+	}
 
-    public List<UpcomingAppointmentDTO> getUpcomingAppointments(
-            String email) {
+	public List<UpcomingAppointmentDTO> getUpcomingAppointments(String email) {
 
-        Patient patient = patientRepository.findByUserEmail(email)
-                .orElseThrow(() ->
-                    new RuntimeException("Patient not found"));
+		Patient patient = patientRepository.findByUserEmail(email)
+				.orElseThrow(() -> new RuntimeException("Patient not found"));
 
-        return appointmentRepository.findUpcomingAppointments(
-                patient.getId(),
-                LocalDateTime.now()
-        ).stream().map(a -> new UpcomingAppointmentDTO(
-                a.getId(),
-                a.getDoctor().getUser().getName(),
-                a.getDoctor().getSpecialization(),
-                a.getAppointmentDate(),
-                a.getStatus()
-        )).toList();
-    }
+		return appointmentRepository.findUpcomingAppointments(patient.getId(), LocalDateTime.now()).stream()
+				.map(a -> new UpcomingAppointmentDTO(a.getId(), a.getDoctor().getUser().getName(),
+						a.getDoctor().getSpecialization(), a.getAppointmentDate(), a.getStatus()))
+				.toList();
+	}
 
-    public List<RecentReportDTO> getRecentReports(String email) {
+	public List<RecentReportDTO> getRecentReports(String email) {
 
-        Patient patient = patientRepository.findByUserEmail(email)
-                .orElseThrow(() ->
-                    new RuntimeException("Patient not found"));
+		Patient patient = patientRepository.findByUserEmail(email)
+				.orElseThrow(() -> new RuntimeException("Patient not found"));
 
-        return medicalReportRepository
-                .findTop5ByPatientIdOrderByUploadedAtDesc(patient.getId())
-                .stream()
-                .map(r -> new RecentReportDTO(
-                        r.getId(),
-                        r.getReportName(),
-                        r.getReportType(),
-                        r.getUploadedAt()
-                ))
-                .toList();
-    }
+		return medicalReportRepository.findTop5ByPatientIdOrderByUploadedAtDesc(patient.getId()).stream()
+				.map(r -> new RecentReportDTO(r.getId(), r.getReportName(), r.getReportType(), r.getUploadedAt()))
+				.toList();
+	}
 }

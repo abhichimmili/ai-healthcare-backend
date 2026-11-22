@@ -2,19 +2,20 @@ package com.spam.ai_healthcare_backend.service;
 
 import java.util.List;
 
-import com.spam.ai_healthcare_backend.model.MedicalReport;
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.spam.ai_healthcare_backend.dto.MedicalReportResponse;
 
 public interface MedicalReportService {
 
-    MedicalReport uploadReport(MedicalReport report);
+	MedicalReportResponse uploadReport(String email, String reportName, String reportType, MultipartFile file);
 
-    List<MedicalReport> getAllReports();
+	List<MedicalReportResponse> getMyReports(String email);
 
-    MedicalReport getReportById(Long id);
+	MedicalReportResponse getReportById(Long id, String email);
 
-//    List<MedicalReport> getReportsByPatientId(Long patientId);
+	Resource downloadReport(Long id, String email);
 
-    MedicalReport updateReport(Long id, MedicalReport report);
-
-    void deleteReport(Long id);
+	void deleteReport(Long id, String email);
 }

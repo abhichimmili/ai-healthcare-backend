@@ -12,6 +12,8 @@ public interface MedicalHistoryRepository
     List<MedicalHistory> findByPatientIdOrderByDiagnosisDateDesc(
             Long patientId
     );
-    
-   List<MedicalHistory> findByPatientId(Long patientId);
+
+    List<MedicalHistory> findByPatientUserEmailOrderByDiagnosisDateDesc(
+            String email
+    );
 }

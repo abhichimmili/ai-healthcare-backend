@@ -2,19 +2,18 @@ package com.spam.ai_healthcare_backend.service;
 
 import java.util.List;
 
-import com.spam.ai_healthcare_backend.model.MedicalHistory;
+import com.spam.ai_healthcare_backend.dto.MedicalHistoryRequest;
+import com.spam.ai_healthcare_backend.dto.MedicalHistoryResponse;
 
 public interface MedicalHistoryService {
 
-    MedicalHistory addMedicalHistory(MedicalHistory history);
+	MedicalHistoryResponse addMedicalHistory(String email, MedicalHistoryRequest request);
 
-    List<MedicalHistory> getAllMedicalHistory();
+	List<MedicalHistoryResponse> getMyMedicalHistory(String email);
 
-    MedicalHistory getMedicalHistoryById(Long id);
+	MedicalHistoryResponse getMedicalHistoryById(Long id, String email);
 
-    List<MedicalHistory> getHistoryByPatientId(Long patientId);
+	MedicalHistoryResponse updateMedicalHistory(Long id, String email, MedicalHistoryRequest request);
 
-    MedicalHistory updateMedicalHistory(Long id, MedicalHistory history);
-
-    void deleteMedicalHistory(Long id);
+	void deleteMedicalHistory(Long id, String email);
 }

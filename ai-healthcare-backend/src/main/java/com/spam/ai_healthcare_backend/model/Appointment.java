@@ -2,17 +2,19 @@ package com.spam.ai_healthcare_backend.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
 @Table(name = "appointments")
+@Data
 public class Appointment {
 
     @Id
@@ -35,64 +37,4 @@ public class Appointment {
 
     private String reason;
 
-    public Appointment() {
-    }
-
-    public Appointment(Long id, Patient patient, Doctor doctor,
-            LocalDateTime appointmentDate, String status, String reason) {
-        this.id = id;
-        this.patient = patient;
-        this.doctor = doctor;
-        this.appointmentDate = appointmentDate;
-        this.status = status;
-        this.reason = reason;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
-
-    public Doctor getDoctor() {
-        return doctor;
-    }
-
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
-    }
-
-    public LocalDateTime getAppointmentDate() {
-        return appointmentDate;
-    }
-
-    public void setAppointmentDate(LocalDateTime appointmentDate) {
-        this.appointmentDate = appointmentDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
 }
