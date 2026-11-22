@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.spam.ai_healthcare_backend.model.MedicalReport;
 import com.spam.ai_healthcare_backend.repository.MedicalReportRepository;
-import com.spam.ai_healthcare_backend.service.MedicalReportService;
 
 @Service
 public class MedicalReportServiceImpl implements MedicalReportService {
