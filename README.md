@@ -1,114 +1,139 @@
-# ai-healthcare-backendCareAI Backend
-CareAI is the Spring Boot REST API used by the CareAI frontend. It
-provides authentication and role-based APIs for patients and doctors.
-Tech Stack
+# CareAI Backend
+
+CareAI is a Spring Boot REST API that powers the CareAI healthcare application. It provides authentication and role-based APIs for patients and doctors.
+
+## Tech Stack
+
 - Java
 - Spring Boot
 - Spring Security
-- JWT-based authentication
+- JWT Authentication
 - Maven
-- JPA / Hibernate
-- Relational database configured in the project
-- Swagger / OpenAPI (if enabled in the project)
-Use the Java, Spring Boot, and database versions declared in this
-project's pom.xml and configuration files.
+- Spring Data JPA / Hibernate
+- MySQL (if configured in the project)
+- Swagger / OpenAPI
 
-Prerequisites
-Before running the backend, install:
-- JDK version compatible with the project
-- Maven (or use the included Maven Wrapper, if present)
-- The database configured by the project
-- An IDE such as Eclipse or IntelliJ IDEA (optional)
-Project Setup
+## Prerequisites
+
+Before running the project, install:
+
+- JDK compatible with the project
+- Maven
+- MySQL Server (if using MySQL)
+- Eclipse or IntelliJ IDEA (optional)
+
+## Project Setup
+
 1. Clone or download the backend project.
-2. Open the project in your IDE, or open a terminal in the folder
-   containing pom.xml.
-3. Check src/main/resources/application.properties (or
-   application.yml).
-4. Configure the database connection and credentials for your local
-   environment.
-5. Make sure the configured database exists and is running.
-Example database configuration (use this only if your project uses
-MySQL; update the database name, username, and password):
+2. Open the project in Eclipse or IntelliJ IDEA.
+3. Open the `application.properties` file.
+4. Configure your database connection.
+5. Make sure your database server is running.
+
+### Database Configuration
+
+Example MySQL configuration:
+
+```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-Do not commit real database passwords, JWT secrets, or other credentials
-to a public repository. Use environment variables or a local, untracked
-configuration file for secrets.
-Run the Application
-From the project root:
+```
+
+Replace the database name, username, and password with your actual credentials.
+
+**Note:** Never upload database passwords or JWT secrets to a public GitHub repository.
+
+## Run the Application
+
+Open the terminal in the backend project directory and execute:
+
+```bash
 mvn clean install
 mvn spring-boot:run
-If the project includes Maven Wrapper, you can use:
+```
 
-Windows
+If you are using Maven Wrapper on Windows:
+
+```bash
 mvnw.cmd spring-boot:run
-macOS / Linux
-./mvnw spring-boot:run
-The frontend integration currently expects the backend at:
+```
+
+The backend runs at:
+
+```text
 http://localhost:8080
-If the backend uses a different port, update the frontend API base URL
-in src/services/api.js.
-Authentication and Authorization
-The backend uses JWT authentication.
-1. A user registers or logs in through the authentication API.
-2. After successful login, the frontend stores the returned JWT using
-   the token key in localStorage.
-3. The frontend sends the token with protected requests in this header:
+```
+
+## Authentication and Authorization
+
+The application uses JWT-based authentication.
+
+1. Users register as patients or doctors.
+2. Users log in using their credentials.
+3. The backend generates a JWT token after successful authentication.
+4. The frontend stores the token in local storage.
+5. The token is sent with protected API requests using the Authorization header.
+
+Example:
+
+```http
 Authorization: Bearer <JWT_TOKEN>
-4. Spring Security validates the token and loads the user's
-   authorities.
-5. Access to patient and doctor endpoints is restricted by role.
-The current security configuration permits these routes without
-authentication:
-- /api/auth/**
-- /api/patients/register
-- /api/doctors/register
-- Swagger/OpenAPI routes configured in SecurityConfig
-Role-protected route patterns:
+```
 
-  Route pattern       Required role
-  /api/patient/**   PATIENT
-/api/doctor/**    DOCTOR
+### Role-Based Access
 
-The role stored for a user must match the role expected by Spring
-Security. With User.withUsername(...).roles(user.getRole()), store
-values such as PATIENT or DOCTOR (without the ROLE_ prefix),
-unless the implementation is changed accordingly.
-API Endpoints Used by the Frontend
-The frontend currently calls the following dashboard endpoints:
-  Method                  Endpoint                                         Purpose
-  GET                     /api/patient/dashboard                         Load patient dashboard
-summary
+The application uses Spring Security to restrict access based on user roles.
 
-  GET                     /api/patient/dashboard/upcoming-appointments   Load upcoming patient
-appointments
+| API Route | Required Role |
+|---|---|
+| `/api/patient/**` | PATIENT |
+| `/api/doctor/**` | DOCTOR |
+| `/api/auth/**` | Public access |
+| `/api/patients/register` | Public access |
+| `/api/doctors/register` | Public access |
 
-  GET                     /api/patient/dashboard/recent-reports          Load recent patient
-reports
-GET                     /api/doctor/dashboard                          Load doctor dashboard
-summary
-These routes require a valid JWT and the matching user role.
+## API Endpoints
 
-Authentication, registration, appointment, report, and other API routes
-may also be present. Check the backend controllers for the complete and
-authoritative endpoint list.
-Swagger / API Testing
-If Swagger/OpenAPI is included and configured, start the backend and
-open:
+The following dashboard APIs are used by the frontend.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/patient/dashboard` | Get patient dashboard details |
+| GET | `/api/patient/dashboard/upcoming-appointments` | Get upcoming appointments |
+| GET | `/api/patient/dashboard/recent-reports` | Get recent medical reports |
+| GET | `/api/doctor/dashboard` | Get doctor dashboard details |
+
+These dashboard endpoints require valid authentication and the appropriate user role.
+
+Refer to the backend controllers for the complete list of available APIs.
+
+## Swagger API Documentation
+
+If Swagger is configured in the project, start the backend and open:
+
+```text
 http://localhost:8080/swagger-ui/index.html
-If this page is unavailable, verify that the OpenAPI dependency is
-present in pom.xml and check the Swagger path configured by the
-project.
+```
 
-You can also test endpoints using Postman or the frontend. For protected
-endpoints, include the JWT bearer token.
-CORS Configuration
-The current security configuration allows the frontend origin:
+Swagger allows you to:
+
+- View available REST API endpoints.
+- Test GET, POST, PUT and DELETE requests.
+- Check API request and response details.
+- Test authenticated endpoints using a JWT token.
+
+## CORS Configuration
+
+The backend currently allows requests from the React frontend:
+
+```text
 http://localhost:5173
-Allowed methods:
+```
+
+Allowed HTTP methods:
+
 - GET
 - POST
 - PUT
