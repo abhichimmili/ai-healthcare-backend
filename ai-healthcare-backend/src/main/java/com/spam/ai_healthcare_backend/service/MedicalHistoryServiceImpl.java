@@ -2,10 +2,8 @@ package com.spam.ai_healthcare_backend.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.spam.ai_healthcare_backend.dto.MedicalHistoryRequest;
 import com.spam.ai_healthcare_backend.dto.MedicalHistoryResponse;
@@ -13,6 +11,7 @@ import com.spam.ai_healthcare_backend.model.MedicalHistory;
 import com.spam.ai_healthcare_backend.model.Patient;
 import com.spam.ai_healthcare_backend.repository.MedicalHistoryRepository;
 import com.spam.ai_healthcare_backend.repository.PatientRepository;
+import com.spam.ai_healthcare_backend.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +34,8 @@ public class MedicalHistoryServiceImpl implements MedicalHistoryService {
 
         history.setPatient(patient);
         history.setConditionName(request.getConditionName());
+        history.setCategory(request.getCategory());
+        history.setDoctorOrHospital(request.getDoctorOrHospital());
         history.setDescription(request.getDescription());
         history.setDiagnosisDate(request.getDiagnosisDate());
         history.setTreatment(request.getTreatment());
@@ -74,6 +75,8 @@ public class MedicalHistoryServiceImpl implements MedicalHistoryService {
         MedicalHistory history = getOwnedHistory(id, email);
 
         history.setConditionName(request.getConditionName());
+        history.setCategory(request.getCategory());
+        history.setDoctorOrHospital(request.getDoctorOrHospital());
         history.setDescription(request.getDescription());
         history.setDiagnosisDate(request.getDiagnosisDate());
         history.setTreatment(request.getTreatment());
@@ -93,25 +96,16 @@ public class MedicalHistoryServiceImpl implements MedicalHistoryService {
     private Patient getPatient(String email) {
 
         return patientRepository.findByUserEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Patient profile not found"
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
     }
 
     private MedicalHistory getOwnedHistory(Long id, String email) {
 
         MedicalHistory history = historyRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Medical history not found"
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException("Medical history not found"));
 
         if (!history.getPatient().getUser().getEmail().equals(email)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Medical history not found"
-            );
+            throw new ResourceNotFoundException("Medical history not found");
         }
 
         return history;
@@ -123,6 +117,8 @@ public class MedicalHistoryServiceImpl implements MedicalHistoryService {
         return new MedicalHistoryResponse(
                 history.getId(),
                 history.getConditionName(),
+                history.getCategory(),
+                history.getDoctorOrHospital(),
                 history.getDescription(),
                 history.getDiagnosisDate(),
                 history.getTreatment(),

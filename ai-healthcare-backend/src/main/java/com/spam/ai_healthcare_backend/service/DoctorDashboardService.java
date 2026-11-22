@@ -11,6 +11,7 @@ import com.spam.ai_healthcare_backend.model.Doctor;
 
 import com.spam.ai_healthcare_backend.repository.DoctorRepository;
 import com.spam.ai_healthcare_backend.repository.AppointmentRepository;
+import com.spam.ai_healthcare_backend.exception.ResourceNotFoundException;
 
 @Service
 @Transactional(readOnly = true)
@@ -31,7 +32,7 @@ public class DoctorDashboardService {
 
         Doctor doctor = doctorRepository.findByUserEmail(email)
                 .orElseThrow(() ->
-                    new RuntimeException("Doctor profile not found"));
+                    new ResourceNotFoundException("Doctor profile not found"));
 
         Long doctorId = doctor.getId();
 

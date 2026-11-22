@@ -13,6 +13,7 @@ import com.spam.ai_healthcare_backend.model.Patient;
 import com.spam.ai_healthcare_backend.repository.AppointmentRepository;
 import com.spam.ai_healthcare_backend.repository.MedicalReportRepository;
 import com.spam.ai_healthcare_backend.repository.PatientRepository;
+import com.spam.ai_healthcare_backend.exception.ResourceNotFoundException;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,7 +34,7 @@ public class PatientDashboardService {
 	public PatientDashboardDTO getDashboard(String email) {
 
 		Patient patient = patientRepository.findByUserEmail(email)
-				.orElseThrow(() -> new RuntimeException("Patient profile not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
 
 		Long patientId = patient.getId();
 
@@ -51,7 +52,7 @@ public class PatientDashboardService {
 	public List<UpcomingAppointmentDTO> getUpcomingAppointments(String email) {
 
 		Patient patient = patientRepository.findByUserEmail(email)
-				.orElseThrow(() -> new RuntimeException("Patient not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
 
 		return appointmentRepository.findUpcomingAppointments(patient.getId(), LocalDateTime.now()).stream()
 				.map(a -> new UpcomingAppointmentDTO(a.getId(), a.getDoctor().getUser().getName(),
@@ -62,7 +63,7 @@ public class PatientDashboardService {
 	public List<RecentReportDTO> getRecentReports(String email) {
 
 		Patient patient = patientRepository.findByUserEmail(email)
-				.orElseThrow(() -> new RuntimeException("Patient not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
 
 		return medicalReportRepository.findTop5ByPatientIdOrderByUploadedAtDesc(patient.getId()).stream()
 				.map(r -> new RecentReportDTO(r.getId(), r.getReportName(), r.getReportType(), r.getUploadedAt()))

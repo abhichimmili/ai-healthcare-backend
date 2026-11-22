@@ -1,5 +1,6 @@
 package com.spam.ai_healthcare_backend.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ import com.spam.ai_healthcare_backend.repository.PatientRepository;
 
 @RestController
 @RequestMapping("/api/appointments")
-@CrossOrigin(origins = "http://localhost:5173")
 public class AppointmentController {
 
     @Autowired
@@ -88,7 +88,7 @@ public class AppointmentController {
     @PostMapping
     @PreAuthorize("hasRole('PATIENT')")
     public AppointmentResponse bookAppointment(
-            @RequestBody AppointmentRequest request,
+            @Valid @RequestBody AppointmentRequest request,
             Authentication authentication) {
 
         Patient patient = patientRepository

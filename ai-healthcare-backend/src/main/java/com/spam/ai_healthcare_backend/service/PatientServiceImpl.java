@@ -12,6 +12,8 @@ import com.spam.ai_healthcare_backend.model.User;
 import com.spam.ai_healthcare_backend.model.Patient;
 import com.spam.ai_healthcare_backend.repository.UserRepository;
 import com.spam.ai_healthcare_backend.repository.PatientRepository;
+import com.spam.ai_healthcare_backend.exception.BadRequestException;
+import com.spam.ai_healthcare_backend.exception.DuplicateResourceException;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -31,12 +33,12 @@ public class PatientServiceImpl implements PatientService {
 
         // Check whether email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new DuplicateResourceException("Email already registered");
         }
 
         // Check password and confirm password
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new RuntimeException("Passwords do not match");
+            throw new BadRequestException("Passwords do not match");
         }
 
         // Create User object

@@ -3,6 +3,10 @@ package com.spam.ai_healthcare_backend.controller;
 import java.security.Principal;
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import org.springframework.validation.annotation.Validated;
+
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,6 +21,7 @@ import com.spam.ai_healthcare_backend.service.MedicalReportService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
+@Validated
 @RequestMapping("/api/medical-reports")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('PATIENT')")
@@ -25,8 +30,8 @@ public class MedicalReportController {
 	private final MedicalReportService reportService;
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<MedicalReportResponse> uploadReport(Principal principal, @RequestParam String reportName,
-			@RequestParam(required = false) String reportType, @RequestParam MultipartFile file) {
+	public ResponseEntity<MedicalReportResponse> uploadReport(Principal principal, @RequestParam @NotBlank @Size(max = 150) String reportName,
+			@RequestParam(required = false) @Size(max = 50) String reportType, @RequestParam MultipartFile file) {
 
 		return ResponseEntity.status(201)
 				.body(reportService.uploadReport(principal.getName(), reportName, reportType, file));

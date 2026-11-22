@@ -27,6 +27,12 @@ public class MedicalHistory {
 
     private String conditionName;
 
+    @Column(length = 50)
+    private String category;
+
+    @Column(name = "doctor_or_hospital", length = 150)
+    private String doctorOrHospital;
+
     @Column(length = 2000)
     private String description;
 

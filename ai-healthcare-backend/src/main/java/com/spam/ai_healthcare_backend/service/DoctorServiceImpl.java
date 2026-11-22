@@ -13,6 +13,8 @@ import com.spam.ai_healthcare_backend.dto.DoctorRegistrationRequest;
 import com.spam.ai_healthcare_backend.model.User;
 import com.spam.ai_healthcare_backend.model.Doctor;
 
+import com.spam.ai_healthcare_backend.exception.BadRequestException;
+import com.spam.ai_healthcare_backend.exception.DuplicateResourceException;
 import com.spam.ai_healthcare_backend.repository.UserRepository;
 import com.spam.ai_healthcare_backend.repository.DoctorRepository;
 
@@ -34,19 +36,19 @@ public class DoctorServiceImpl implements DoctorService {
 
         // Check whether email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new DuplicateResourceException("Email already registered");
         }
 
         // Check password and confirm password
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new RuntimeException("Passwords do not match");
+            throw new BadRequestException("Passwords do not match");
         }
 
         // Check duplicate medical license
         if (doctorRepository.existsByMedicalLicenseNumber(
                 request.getMedicalLicenseNumber())) {
 
-            throw new RuntimeException("Medical license already registered");
+            throw new DuplicateResourceException("Medical license already registered");
         }
 
         // Create User object
